@@ -55,4 +55,4 @@ export default class PhonesPage {
         </div>
     `;
   }
-}
+};

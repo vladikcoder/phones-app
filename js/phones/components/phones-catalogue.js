@@ -162,4 +162,4 @@ export default class PhonesCatalogue {
       </ul>
     `;
   }
-}
+};
