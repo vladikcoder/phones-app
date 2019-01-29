@@ -8,11 +8,11 @@ export default class PhonesCatalogue {
 
   _render() {
     this._element.innerHTML = `
-      ${this._phones.map(el => `
+      ${this._phones.map(phone => `
         <ul class="phones">
           <li class="thumbnail">
-            <a href="#!/phones/motorola-xoom-with-wi-fi" class="thumb">
-              <img alt="Motorola XOOM™ with Wi-Fi" src="img/phones/motorola-xoom-with-wi-fi.0.jpg">
+            <a href="#!/phones/${phone.id}" class="thumb">
+              <img alt="${phone.name}" src="${phone.imageUrl}">
             </a>
   
             <div class="phones__btn-buy-wrapper">
@@ -21,10 +21,8 @@ export default class PhonesCatalogue {
               </a>
             </div>
   
-            <a href="#!/phones/motorola-xoom-with-wi-fi">Motorola XOOM™ with Wi-Fi</a>
-            <p>The Next, Next Generation
-  
-              Experience the future with Motorola XOOM with Wi-Fi, the world's first tablet powered by Android 3.0 (Honeycomb).</p>
+            <a href="#!/phones/${phone.id}">${phone.name}</a>
+            <p>${phone.snippet}</p>
           </li>
         </ul>
       `).join('')}
