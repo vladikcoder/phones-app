@@ -1,16 +1,24 @@
 import Component from '../../component.js';
 
 export default class PhonesCatalogue extends Component {
-  constructor({ element, phones, onSelect, onAdd }) {
+  constructor({ element, phones, onSelect = () => {}, onAdd = () => {}, }) {
     super({ element });
 
     this._element = element;
     this._phones = phones;
 
+    this._onSelect = onSelect;
+    this._onAdd = onAdd;
+
     this._render();
 
-    this._element.addEventListener('click', onSelect);
-    this._element.addEventListener('click', onAdd);
+    this.on('click', '[data-element="add-button"]', (event) => {
+      this._onAdd(event);
+    });
+
+    this.on('click', '[data-element="phone-selected"]',  (event) => {
+      this._onSelect();
+    })
   }
 
   _render() {

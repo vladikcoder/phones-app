@@ -1,14 +1,23 @@
 import Component from '../../component.js';
 
 export default class PhoneViewer extends Component {
-  constructor({ element, phoneDetails, onSetPreview, onBack}) {
+  constructor({ element, phoneDetails, onSetPreview = () => {}, onBack = () => {}, }) {
     super({ element });
 
     this._element = element;
     this._phoneDetails = phoneDetails;
 
-    this._element.addEventListener('click', onSetPreview);
-    this._element.addEventListener('click', onBack);
+    this._onSetPreview = onSetPreview;
+    this._onBack = onBack;
+
+
+    this.on('click', '[data-element="image-selected"]', (event, imageSelected) => {
+      this._onSetPreview(imageSelected);
+    });
+
+    this.on('click', '[data-element="catalogue-back-btn"]', (event) => {
+      this._onBack();
+    });
 
     this._render();
   }

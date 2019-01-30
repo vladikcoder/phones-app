@@ -15,24 +15,12 @@ export default class PhonesPage extends Component{
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
       phones: PhoneService.getPhones(),
-      onSelect: (event) => {
-        let phoneSelected = event.target.closest('[data-element="phone-selected"]');
-
-        if(!phoneSelected) {
-          return;
-        }
-
+      onSelect: () => {
         this._catalogue.hide();
         this._viewer.show();
       },
 
       onAdd: (event) => {
-        let addButton = event.target.closest('[data-element="add-button"]');
-
-        if(!addButton) {
-          return;
-        }
-
         let currentPhone = event.target.closest('[data-element="phone-in-list"]');
         let phoneId = currentPhone.dataset.phoneId;
 
@@ -60,25 +48,14 @@ export default class PhonesPage extends Component{
     this._viewer = new PhoneViewer({
       element: document.querySelector('[data-component="phone-viewer"]'),
       phoneDetails: PhoneService.getById(),
-      onSetPreview: (event) => {
-        let imageSelected = event.target.closest('[data-element="image-selected"]');
 
-        if(!imageSelected) {
-          return;
-        }
-
+      onSetPreview: (imageSelected) => {
         let imgPreviewElement = this._element.querySelector('[data-element="image-preview"]');
 
         imgPreviewElement.src = imageSelected.src;
       },
 
-      onBack: (event) => {
-        let backButton = event.target.closest('[data-element="catalogue-back-btn"]');
-
-        if(!backButton) {
-          return;
-        }
-
+      onBack: () => {
         this._catalogue.show();
         this._viewer.hide();
       },
@@ -87,13 +64,7 @@ export default class PhonesPage extends Component{
 
     this._cart = new ShoppingCart({
       element: document.querySelector('[data-component="shopping-cart"]'),
-      onRemove: (event) => {
-        let itemToRemove = event.target.closest('[data-element="item-in-cart"]');
-
-        if(!itemToRemove) {
-          return;
-        }
-
+      onRemove: (itemToRemove) => {
         itemToRemove.remove();
 
         let itemsContainer = document.querySelector('[data-element="shop-items-container"]');
