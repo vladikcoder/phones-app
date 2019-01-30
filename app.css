@@ -105,3 +105,8 @@ ul.specs dt {
 h1 {
   border-bottom: 1px solid gray;
 }
+
+[data-element="remove-from-cart"] {
+  color: #f00;
+  cursor: pointer;
+}

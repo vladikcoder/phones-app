@@ -1,11 +1,12 @@
 export default class PhonesCatalogue {
-  constructor({ element, phones, onSelect }) {
+  constructor({ element, phones, onSelect, onAdd }) {
     this._element = element;
     this._phones = phones;
 
     this._render();
 
     this._element.addEventListener('click', onSelect);
+    this._element.addEventListener('click', onAdd);
   }
 
   hide() {
@@ -39,7 +40,7 @@ export default class PhonesCatalogue {
               </a>
       
               <div class="phones__btn-buy-wrapper">
-                <a class="btn btn-success">
+                <a data-element="add-button" class="btn btn-success">
                   Add
                 </a>
               </div>

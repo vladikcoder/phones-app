@@ -1,6 +1,7 @@
 import PhonesCatalogue from './components/phones-catalogue.js';
 import PhoneViewer from './components/phone-viewer.js';
 import PhoneService from './services/phone-service.js';
+import ShoppingCart from './components/shopping-cart.js';
 
 
 export default class PhonesPage {
@@ -21,6 +22,36 @@ export default class PhonesPage {
 
         this._catalogue.hide();
         this._viewer.show();
+      },
+
+      onAdd: (event) => {
+        let addButton = event.target.closest('[data-element="add-button"]');
+
+        if(!addButton) {
+          return;
+        }
+
+        let currentPhone = event.target.closest('[data-element="phone-in-list"]');
+        let phoneId = currentPhone.dataset.phoneId;
+
+        let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
+
+        let cartContainer = document.querySelector('[data-element="shop-items-container"]');
+
+        let emptyLabel = document.querySelector('[data-element="empty-label"]');
+
+        if (cartContainer.contains(emptyLabel)) {
+          emptyLabel.hidden = true;
+        }
+
+        cartContainer.insertAdjacentHTML('beforeend',
+          `<li 
+            data-element="item-in-cart"
+            data-phone-id="${phoneId}"
+           >
+            ${phoneInfo.name} 
+            <span data-element="remove-from-cart">[x]</span>
+           </li>`);
       },
     });
 
@@ -49,8 +80,28 @@ export default class PhonesPage {
         this._catalogue.show();
         this._viewer.hide();
       },
+
     });
 
+    this._cart = new ShoppingCart({
+      element: document.querySelector('[data-component="shopping-cart"]'),
+      onRemove: (event) => {
+        let itemToRemove = event.target.closest('[data-element="item-in-cart"]');
+
+        if(!itemToRemove) {
+          return;
+        }
+
+        itemToRemove.remove();
+
+        let itemsContainer = document.querySelector('[data-element="shop-items-container"]');
+        let emptyLabel = document.querySelector('[data-element="empty-label"]');
+        
+        if (itemsContainer.lastElementChild === emptyLabel) {
+          emptyLabel.hidden = false;
+        }
+      },
+    })
   }
 
   _render() {
@@ -75,12 +126,7 @@ export default class PhonesPage {
           </section>
     
           <section>
-            <p>Shopping Cart</p>
-            <ul>
-              <li>Phone 1</li>
-              <li>Phone 2</li>
-              <li>Phone 3</li>
-            </ul>
+            <div data-component="shopping-cart"></div>
           </section>
         </div>
     

@@ -28,7 +28,7 @@ export default class PhoneViewer {
       >
 
       <button data-element="catalogue-back-btn">Back</button>
-      <button>Add to basket</button>
+      <button data-element="add-button">Add to basket</button>
   
   
       <h1>${phone.name}</h1>
