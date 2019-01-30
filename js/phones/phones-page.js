@@ -2,10 +2,12 @@ import PhonesCatalogue from './components/phones-catalogue.js';
 import PhoneViewer from './components/phone-viewer.js';
 import PhoneService from './services/phone-service.js';
 import ShoppingCart from './components/shopping-cart.js';
+import Component from '../component.js';
 
-
-export default class PhonesPage {
+export default class PhonesPage extends Component{
   constructor({ element }) {
+    super({ element });
+
     this._element = element;
 
     this._render();

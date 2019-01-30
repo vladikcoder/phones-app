@@ -1,20 +1,16 @@
-export default class PhoneViewer {
+import Component from '../../component.js';
+
+export default class PhoneViewer extends Component {
   constructor({ element, phoneDetails, onSetPreview, onBack}) {
+    super({ element });
+
     this._element = element;
     this._phoneDetails = phoneDetails;
 
     this._element.addEventListener('click', onSetPreview);
     this._element.addEventListener('click', onBack);
-  }
 
-  show() {
     this._render();
-
-    this._element.hidden = false;
-  }
-
-  hide() {
-    this._element.hidden = true;
   }
 
   _render() {
