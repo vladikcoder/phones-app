@@ -15,9 +15,10 @@ export default class PhonesPage extends Component{
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
       phones: PhoneService.getPhones(),
-      onSelect: () => {
+      onSelect: (event, phoneId) => {
         this._catalogue.hide();
         this._viewer.show();
+        this._viewer._render(phoneId);
       },
 
       onAdd: (event) => {
@@ -47,7 +48,7 @@ export default class PhonesPage extends Component{
 
     this._viewer = new PhoneViewer({
       element: document.querySelector('[data-component="phone-viewer"]'),
-      phoneDetails: PhoneService.getById(),
+      phonesDetails: PhoneService.getById,
 
       onSetPreview: (imageSelected) => {
         let imgPreviewElement = this._element.querySelector('[data-element="image-preview"]');
@@ -107,7 +108,7 @@ export default class PhonesPage extends Component{
         <div class="col-md-10">
           
           <div data-component="phones-catalogue"></div>
-          <div data-component="phone-viewer" hidden></div>
+          <div data-component="phone-viewer"></div>
               
         </div>
       </div>

@@ -16,8 +16,10 @@ export default class PhonesCatalogue extends Component {
       this._onAdd(event);
     });
 
-    this.on('click', '[data-element="phone-selected"]',  (event) => {
-      this._onSelect();
+    this.on('click', '[data-element="phone-selected"]',  (event, phoneSelectedElement) => {
+      let phoneId = phoneSelectedElement.closest('[data-element="phone-in-list"]').dataset.phoneId;
+
+      this._onSelect(event, phoneId);
     })
   }
 

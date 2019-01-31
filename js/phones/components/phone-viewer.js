@@ -1,11 +1,11 @@
 import Component from '../../component.js';
 
 export default class PhoneViewer extends Component {
-  constructor({ element, phoneDetails, onSetPreview = () => {}, onBack = () => {}, }) {
+  constructor({ element, phonesDetails, onSetPreview = () => {}, onBack = () => {}, }) {
     super({ element });
 
     this._element = element;
-    this._phoneDetails = phoneDetails;
+    this._phonesDetails = phonesDetails;
 
     this._onSetPreview = onSetPreview;
     this._onBack = onBack;
@@ -15,15 +15,13 @@ export default class PhoneViewer extends Component {
       this._onSetPreview(imageSelected);
     });
 
-    this.on('click', '[data-element="catalogue-back-btn"]', (event) => {
+    this.on('click', '[data-element="catalogue-back-btn"]', () => {
       this._onBack();
     });
-
-    this._render();
   }
 
-  _render() {
-    let phone = this._phoneDetails;
+  _render(phoneId) {
+    let phone = this._phonesDetails(phoneId);
 
     this._element.innerHTML = `
       <img 
