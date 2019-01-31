@@ -27,22 +27,17 @@ export default class PhonesPage extends Component{
 
         let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
 
-        let cartContainer = document.querySelector('[data-element="shop-items-container"]');
+        let phoneName = phoneInfo.name;
 
-        let emptyLabel = document.querySelector('[data-element="empty-label"]');
-
-        if (cartContainer.contains(emptyLabel)) {
-          emptyLabel.hidden = true;
+        let cartItemsList = this._cart._itemsCount;
+        
+        if (!cartItemsList.hasOwnProperty(phoneName)) {
+          cartItemsList[phoneName] = 1;
+        } else {
+          cartItemsList[phoneName] += 1;
         }
 
-        cartContainer.insertAdjacentHTML('beforeend',
-          `<li 
-            data-element="item-in-cart"
-            data-phone-id="${phoneId}"
-           >
-            ${phoneInfo.name} 
-            <span data-element="remove-from-cart">[x]</span>
-           </li>`);
+        this._cart._render(cartItemsList);
       },
     });
 
@@ -61,19 +56,36 @@ export default class PhonesPage extends Component{
         this._viewer.hide();
       },
 
+      onAdd: (addToCartBtn) => {
+        let cartItemsList = this._cart._itemsCount;
+
+        let nameToAdd = addToCartBtn.dataset.addName;
+
+        if (!cartItemsList.hasOwnProperty(nameToAdd)) {
+          cartItemsList[nameToAdd] = 1;
+        } else {
+          cartItemsList[nameToAdd] += 1;
+        }
+
+        this._cart._render(cartItemsList);
+      },
     });
 
     this._cart = new ShoppingCart({
       element: document.querySelector('[data-component="shopping-cart"]'),
-      onRemove: (itemToRemove) => {
-        itemToRemove.remove();
+      onDecrease: (itemToDecrease) => {
 
-        let itemsContainer = document.querySelector('[data-element="shop-items-container"]');
-        let emptyLabel = document.querySelector('[data-element="empty-label"]');
-        
-        if (itemsContainer.lastElementChild === emptyLabel) {
-          emptyLabel.hidden = false;
+        let cartItemsList = this._cart._itemsCount;
+
+        let nameToDecrease = itemToDecrease.dataset.decreaseName;
+
+        if (cartItemsList[nameToDecrease] > 1) {
+          cartItemsList[nameToDecrease] -= 1;
+        } else {
+          delete cartItemsList[nameToDecrease];
         }
+
+        this._cart._render(cartItemsList);
       },
     })
   }

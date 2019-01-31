@@ -1,7 +1,7 @@
 import Component from '../../component.js';
 
 export default class PhoneViewer extends Component {
-  constructor({ element, phonesDetails, onSetPreview = () => {}, onBack = () => {}, }) {
+  constructor({ element, phonesDetails, onSetPreview = () => {}, onBack = () => {}, onAdd = () => {}, }) {
     super({ element });
 
     this._element = element;
@@ -9,7 +9,7 @@ export default class PhoneViewer extends Component {
 
     this._onSetPreview = onSetPreview;
     this._onBack = onBack;
-
+    this._onAdd = onAdd;
 
     this.on('click', '[data-element="image-selected"]', (event, imageSelected) => {
       this._onSetPreview(imageSelected);
@@ -17,6 +17,10 @@ export default class PhoneViewer extends Component {
 
     this.on('click', '[data-element="catalogue-back-btn"]', () => {
       this._onBack();
+    });
+
+    this.on('click', '[data-element="add-from-viewer-button"]', (event, addToCartBtn) => {
+      this._onAdd(addToCartBtn);
     });
   }
 
@@ -31,7 +35,12 @@ export default class PhoneViewer extends Component {
       >
 
       <button data-element="catalogue-back-btn">Back</button>
-      <button data-element="add-button">Add to basket</button>
+      <button 
+        data-element="add-from-viewer-button" 
+        data-add-name="${phone.name}"
+      >
+        Add to basket
+      </button>
   
   
       <h1>${phone.name}</h1>
