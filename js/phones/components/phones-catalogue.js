@@ -62,4 +62,4 @@ export default class PhonesCatalogue extends Component {
       </ul>
     `;
   }
-}
+};

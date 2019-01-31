@@ -9,7 +9,6 @@ export default class Sort extends Component {
     this._render();
 
     this.on('change', '[data-element="sort-select-dropdown"]', (event, dropDown) => {
-      
       this._onChange(dropDown);
     })
   }
@@ -25,4 +24,4 @@ export default class Sort extends Component {
       </p>
     `;
   }
-}
+};

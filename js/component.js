@@ -3,6 +3,14 @@ export default class Component {
     this._element = element;
   }
 
+  sortNames(a, b) {
+    return (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0;
+  }
+
+  sortAges(a, b) {
+    return a.age - b.age;
+  }
+
   hide() {
     this._element.hidden = true;
   }
@@ -22,4 +30,22 @@ export default class Component {
       callback(event, elementSelected);
     });
   }
-}
+
+  debounce(func, ms) {
+    let isBusy = false;
+    let timerId;
+    function wrapper(arg) {
+      if (isBusy) {
+        clearTimeout(timerId);
+      }
+
+      isBusy = true;
+      timerId = setTimeout(() => {
+        func.call(this, arg);
+        isBusy = false;
+      }, ms);
+    }
+
+    return wrapper;
+  }
+};

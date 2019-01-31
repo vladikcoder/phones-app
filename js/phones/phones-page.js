@@ -3,6 +3,7 @@ import PhoneViewer from './components/phone-viewer.js';
 import PhoneService from './services/phone-service.js';
 import ShoppingCart from './components/shopping-cart.js';
 import Sort from './components/sort-select.js';
+import Filter from './components/search-filter.js';
 import Component from '../component.js';
 
 export default class PhonesPage extends Component{
@@ -16,6 +17,8 @@ export default class PhonesPage extends Component{
     this._initCatalogue();
 
     this._initViewer();
+
+    this._initFilter();
 
     this._initSort();
 
@@ -85,17 +88,53 @@ export default class PhonesPage extends Component{
     });
   }
 
+  _initFilter() {
+    this._filter = new Filter({
+      element: document.querySelector('[data-component="search-filter"]'),
+      onChange: (inputItem) => {
+        if (this._filter._inputStatus) {
+          this._filter._cachedPhones = [...this._catalogue._phones];
+          this._filter._inputStatus = false;
+        }
+
+        this._catalogue._phones = [...this._filter._cachedPhones];
+
+        let reg = new RegExp(inputItem.value, 'i');
+        this._catalogue._phones = this._catalogue._phones.filter(phonesObj => phonesObj.name.match(reg));
+
+        this._catalogue._render();
+
+        if (inputItem.value === '') {
+          this._filter._inputStatus = true;
+        }
+      },
+
+    });
+  }
+
   _initSort() {
     this._sort = new Sort({
       element: document.querySelector('[data-component="sort-select"]'),
       onChange: (dropDown) => {
         if (dropDown.value === 'name') {
-          this._catalogue._phones.sort((a, b) => (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0);
+          this._catalogue._phones.sort(this.sortNames);
+
+          if (this._filter._cachedPhones) {
+            this._filter._cachedPhones.sort(this.sortNames);
+          }
+
           this._catalogue._render();
+
         } else if (dropDown.value === 'age') {
-          this._catalogue._phones.sort((a, b) => a.age - b.age);
+          this._catalogue._phones.sort(this.sortAges);
+
+          if (this._filter._cachedPhones) {
+            this._filter._cachedPhones.sort(this.sortAges);
+          }
+
           this._catalogue._render();
         }
+
       },
     });
   }
@@ -127,12 +166,10 @@ export default class PhonesPage extends Component{
         <!--Sidebar-->
         <div class="col-md-2">
           <section>
-            <p>
-              Search:
-              <input>
-            </p>
-    
-          <div data-component="sort-select"></div>
+          
+            <div data-component="search-filter"></div>
+            <div data-component="sort-select"></div>
+          
           </section>
     
           <section>
@@ -150,4 +187,4 @@ export default class PhonesPage extends Component{
       </div>
     `;
   }
-}
+};

@@ -59,4 +59,4 @@ export default class PhoneViewer extends Component {
       </ul>
     `;
   }
-}
+};
