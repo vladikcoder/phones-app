@@ -2,6 +2,7 @@ import PhonesCatalogue from './components/phones-catalogue.js';
 import PhoneViewer from './components/phone-viewer.js';
 import PhoneService from './services/phone-service.js';
 import ShoppingCart from './components/shopping-cart.js';
+import Sort from './components/sort-select.js';
 import Component from '../component.js';
 
 export default class PhonesPage extends Component{
@@ -12,6 +13,16 @@ export default class PhonesPage extends Component{
 
     this._render();
 
+    this._initCatalogue();
+
+    this._initViewer();
+
+    this._initSort();
+
+    this._initCart();
+  }
+
+  _initCatalogue() {
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
       phones: PhoneService.getPhones(),
@@ -30,7 +41,7 @@ export default class PhonesPage extends Component{
         let phoneName = phoneInfo.name;
 
         let cartItemsList = this._cart._itemsCount;
-        
+
         if (!cartItemsList.hasOwnProperty(phoneName)) {
           cartItemsList[phoneName] = 1;
         } else {
@@ -40,7 +51,9 @@ export default class PhonesPage extends Component{
         this._cart._render(cartItemsList);
       },
     });
+  }
 
+  _initViewer() {
     this._viewer = new PhoneViewer({
       element: document.querySelector('[data-component="phone-viewer"]'),
       phonesDetails: PhoneService.getById,
@@ -70,7 +83,24 @@ export default class PhonesPage extends Component{
         this._cart._render(cartItemsList);
       },
     });
+  }
 
+  _initSort() {
+    this._sort = new Sort({
+      element: document.querySelector('[data-component="sort-select"]'),
+      onChange: (dropDown) => {
+        if (dropDown.value === 'name') {
+          this._catalogue._phones.sort((a, b) => (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0);
+          this._catalogue._render();
+        } else if (dropDown.value === 'age') {
+          this._catalogue._phones.sort((a, b) => a.age - b.age);
+          this._catalogue._render();
+        }
+      },
+    });
+  }
+
+  _initCart() {
     this._cart = new ShoppingCart({
       element: document.querySelector('[data-component="shopping-cart"]'),
       onDecrease: (itemToDecrease) => {
@@ -102,13 +132,7 @@ export default class PhonesPage extends Component{
               <input>
             </p>
     
-            <p>
-              Sort by:
-              <select>
-                <option value="name">Alphabetical</option>
-                <option value="age">Newest</option>
-              </select>
-            </p>
+          <div data-component="sort-select"></div>
           </section>
     
           <section>
