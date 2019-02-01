@@ -12,7 +12,7 @@ export default class ShoppingCart extends Component {
 
     this._render(this._itemsCount);
 
-    this.on('click', '[data-element="decrease-item-qty-btn"]', (event, itemToDecrease) => {
+    this.on('click', 'decrease-item-qty-btn', (event, itemToDecrease) => {
       this._onDecrease(itemToDecrease);
     })
   }

@@ -11,15 +11,15 @@ export default class PhoneViewer extends Component {
     this._onBack = onBack;
     this._onAdd = onAdd;
 
-    this.on('click', '[data-element="image-selected"]', (event, imageSelected) => {
+    this.on('click', 'image-selected', (event, imageSelected) => {
       this._onSetPreview(imageSelected);
     });
 
-    this.on('click', '[data-element="catalogue-back-btn"]', () => {
+    this.on('click', 'catalogue-back-btn', () => {
       this._onBack();
     });
 
-    this.on('click', '[data-element="add-from-viewer-button"]', (event, addToCartBtn) => {
+    this.on('click', 'add-from-viewer-button', (event, addToCartBtn) => {
       this._onAdd(addToCartBtn);
     });
   }

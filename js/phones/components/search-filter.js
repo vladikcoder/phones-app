@@ -13,7 +13,7 @@ export default class Filter extends Component {
 
     this._render();
 
-    this.on('input', '[data-element="search-input"]', (event, inputItem) => {
+    this.on('input', 'search-input', (event, inputItem) => {
       this._debounced(inputItem);
     });
   }

@@ -19,9 +19,9 @@ export default class Component {
     this._element.hidden = false;
   }
 
-  on(eventName, selector, callback) {
+  on(eventName, dataElementName, callback) {
     this._element.addEventListener(eventName, (event) => {
-      let elementSelected = event.target.closest(`${selector}`);
+      let elementSelected = event.target.closest(`[data-element="${dataElementName}"]`);
 
       if(!elementSelected || !this._element.contains(elementSelected)) {
         return;
