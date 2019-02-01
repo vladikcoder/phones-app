@@ -1,15 +1,14 @@
 import Component from '../../component.js';
 
 export default class Sort extends Component {
-  constructor({ element, onChange = () => {} }) {
+  constructor({ element }) {
     super({ element });
     this._element = element;
-    this._onChange = onChange;
 
     this._render();
 
     this.on('change', 'sort-select-dropdown', (event, dropDown) => {
-      this._onChange(dropDown);
+      this.emit('sort-type-changed', dropDown);
     })
   }
 

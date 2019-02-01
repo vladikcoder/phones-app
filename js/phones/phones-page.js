@@ -29,30 +29,31 @@ export default class PhonesPage extends Component{
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
       phones: PhoneService.getPhones(),
-      onSelect: (event, phoneId) => {
-        this._catalogue.hide();
-        this._viewer.show();
-        this._viewer._render(phoneId);
-      },
+    });
 
-      onAdd: (event) => {
-        let currentPhone = event.target.closest('[data-element="phone-in-list"]');
-        let phoneId = currentPhone.dataset.phoneId;
+    this._catalogue.subscribe('select-phone', (phoneId) => {
+      this._catalogue.hide();
+      this._viewer.show();
+      this._viewer._render(phoneId);
+    });
 
-        let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
+    this._catalogue.subscribe('add-from-catalogue', (event) => {
+      let currentPhone = event.target.closest('[data-element="phone-in-list"]');
+      let phoneId = currentPhone.dataset.phoneId;
 
-        let phoneName = phoneInfo.name;
+      let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
 
-        let cartItemsList = this._cart._itemsCount;
+      let phoneName = phoneInfo.name;
 
-        if (!cartItemsList.hasOwnProperty(phoneName)) {
-          cartItemsList[phoneName] = 1;
-        } else {
-          cartItemsList[phoneName] += 1;
-        }
+      let cartItemsList = this._cart._itemsCount;
 
-        this._cart._render(cartItemsList);
-      },
+      if (!cartItemsList.hasOwnProperty(phoneName)) {
+        cartItemsList[phoneName] = 1;
+      } else {
+        cartItemsList[phoneName] += 1;
+      }
+
+      this._cart._render(cartItemsList);
     });
   }
 
@@ -60,102 +61,104 @@ export default class PhonesPage extends Component{
     this._viewer = new PhoneViewer({
       element: document.querySelector('[data-component="phone-viewer"]'),
       phonesDetails: PhoneService.getById,
+    });
 
-      onSetPreview: (imageSelected) => {
-        let imgPreviewElement = this._element.querySelector('[data-element="image-preview"]');
+    this._viewer.subscribe('back-button', () => {
+      this._catalogue.show();
+      this._viewer.hide();
+    });
 
-        imgPreviewElement.src = imageSelected.src;
-      },
+    this._viewer.subscribe('add-from-viewer', (addToCartBtn) => {
+      let cartItemsList = this._cart._itemsCount;
 
-      onBack: () => {
-        this._catalogue.show();
-        this._viewer.hide();
-      },
+      let nameToAdd = addToCartBtn.dataset.addName;
 
-      onAdd: (addToCartBtn) => {
-        let cartItemsList = this._cart._itemsCount;
+      if (!cartItemsList.hasOwnProperty(nameToAdd)) {
+        cartItemsList[nameToAdd] = 1;
+      } else {
+        cartItemsList[nameToAdd] += 1;
+      }
 
-        let nameToAdd = addToCartBtn.dataset.addName;
+      this._cart._render(cartItemsList);
+    });
 
-        if (!cartItemsList.hasOwnProperty(nameToAdd)) {
-          cartItemsList[nameToAdd] = 1;
-        } else {
-          cartItemsList[nameToAdd] += 1;
-        }
+    this._viewer.subscribe('set-gallery-preview', (imageSelected) => {
+      let imgPreviewElement = this._element.querySelector('[data-element="image-preview"]');
 
-        this._cart._render(cartItemsList);
-      },
+      imgPreviewElement.src = imageSelected.src;
     });
   }
 
   _initFilter() {
     this._filter = new Filter({
       element: document.querySelector('[data-component="search-filter"]'),
-      onChange: (inputItem) => {
-        if (this._filter._inputStatus) {
-          this._filter._cachedPhones = [...this._catalogue._phones];
-          this._filter._inputStatus = false;
-        }
+    });
 
-        this._catalogue._phones = [...this._filter._cachedPhones];
+    this._filter.subscribe('on-input-change', (inputItem) => {
+      if (this._filter._inputStatus) {
+        this._filter._cachedPhones = [...this._catalogue._phones];
+        this._filter._inputStatus = false;
+      }
 
-        let reg = new RegExp(inputItem.value, 'i');
-        this._catalogue._phones = this._catalogue._phones.filter(phonesObj => phonesObj.name.match(reg));
+      this._catalogue._phones = [...this._filter._cachedPhones];
 
-        this._catalogue._render();
+      let reg = new RegExp(inputItem.value, 'i');
+      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => phonesObj.name.match(reg));
 
-        if (inputItem.value === '') {
-          this._filter._inputStatus = true;
-        }
-      },
+      this._catalogue._render();
 
+      if (inputItem.value === '') {
+        this._filter._inputStatus = true;
+      }
     });
   }
 
   _initSort() {
     this._sort = new Sort({
       element: document.querySelector('[data-component="sort-select"]'),
-      onChange: (dropDown) => {
-        if (dropDown.value === 'name') {
-          this._catalogue._phones.sort(this.sortNames);
+    });
 
-          if (this._filter._cachedPhones) {
-            this._filter._cachedPhones.sort(this.sortNames);
-          }
+    this._sort.subscribe('sort-type-changed', (dropDown) => {
+      if (dropDown.value === 'name') {
+        this._catalogue._phones.sort(this.sortNames);
 
-          this._catalogue._render();
-
-        } else if (dropDown.value === 'age') {
-          this._catalogue._phones.sort(this.sortAges);
-
-          if (this._filter._cachedPhones) {
-            this._filter._cachedPhones.sort(this.sortAges);
-          }
-
-          this._catalogue._render();
+        if (this._filter._cachedPhones) {
+          this._filter._cachedPhones.sort(this.sortNames);
         }
 
-      },
-    });
+        this._catalogue._render();
+
+      } else if (dropDown.value === 'age') {
+        this._catalogue._phones.sort(this.sortAges);
+
+        if (this._filter._cachedPhones) {
+          this._filter._cachedPhones.sort(this.sortAges);
+        }
+
+        this._catalogue._render();
+      }
+
+    })
   }
 
   _initCart() {
     this._cart = new ShoppingCart({
       element: document.querySelector('[data-component="shopping-cart"]'),
-      onDecrease: (itemToDecrease) => {
+    });
 
-        let cartItemsList = this._cart._itemsCount;
+    this._cart.subscribe('decrease-item', (itemToDecrease) => {
 
-        let nameToDecrease = itemToDecrease.dataset.decreaseName;
+      let cartItemsList = this._cart._itemsCount;
 
-        if (cartItemsList[nameToDecrease] > 1) {
-          cartItemsList[nameToDecrease] -= 1;
-        } else {
-          delete cartItemsList[nameToDecrease];
-        }
+      let nameToDecrease = itemToDecrease.dataset.decreaseName;
 
-        this._cart._render(cartItemsList);
-      },
+      if (cartItemsList[nameToDecrease] > 1) {
+        cartItemsList[nameToDecrease] -= 1;
+      } else {
+        delete cartItemsList[nameToDecrease];
+      }
+
+      this._cart._render(cartItemsList);
     })
   }
 

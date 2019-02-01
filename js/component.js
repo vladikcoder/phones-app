@@ -1,6 +1,7 @@
 export default class Component {
   constructor({ element }) {
     this._element = element;
+    this._callbacksMap = {};
   }
 
   sortNames(a, b) {
@@ -29,6 +30,19 @@ export default class Component {
 
       callback(event, elementSelected);
     });
+  }
+
+  subscribe(eventName, callback) {
+    console.assert(
+      !this._callbacksMap.hasOwnProperty(eventName),
+      `Subscription on ${eventName} is already exists!`
+    );
+
+    this._callbacksMap[eventName] = callback;
+  }
+
+  emit(eventName, ...data) {
+    this._callbacksMap[eventName](...data);
   }
 
   debounce(func, ms) {

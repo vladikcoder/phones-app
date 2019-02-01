@@ -1,19 +1,17 @@
 import Component from '../../component.js';
 
 export default class ShoppingCart extends Component {
-  constructor({ element, onDecrease }) {
+  constructor({ element }) {
     super({ element });
 
     this._element = element;
 
     this._itemsCount = {};
 
-    this._onDecrease = onDecrease;
-
     this._render(this._itemsCount);
 
     this.on('click', 'decrease-item-qty-btn', (event, itemToDecrease) => {
-      this._onDecrease(itemToDecrease);
+      this.emit('decrease-item', itemToDecrease);
     })
   }
 
