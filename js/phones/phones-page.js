@@ -9,19 +9,14 @@ import Component from '../component.js';
 export default class PhonesPage extends Component{
   constructor({ element }) {
     super({ element });
-
     this._element = element;
 
     this._render();
 
     this._initCatalogue();
-
     this._initViewer();
-
     this._initFilter();
-
     this._initSort();
-
     this._initCart();
   }
 
@@ -41,7 +36,7 @@ export default class PhonesPage extends Component{
       let currentPhone = event.target.closest('[data-element="phone-in-list"]');
       let phoneId = currentPhone.dataset.phoneId;
 
-      let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
+      let phoneInfo = PhoneService.getPhones.cached.find(phone => phone.id === phoneId);
 
       let phoneName = phoneInfo.name;
 
@@ -96,14 +91,14 @@ export default class PhonesPage extends Component{
 
     this._filter.subscribe('on-input-change', (inputItem) => {
       if (this._filter._inputStatus) {
-        this._filter._cachedPhones = [...this._catalogue._phones];
+        this._filter._cachedPhones = [...PhoneService.getPhones.cached];
         this._filter._inputStatus = false;
       }
 
       this._catalogue._phones = [...this._filter._cachedPhones];
 
       let reg = new RegExp(inputItem.value, 'i');
-      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => phonesObj.name.match(reg));
+      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => reg.test(phonesObj.name));
 
       this._catalogue._render();
 
