@@ -4,14 +4,6 @@ export default class Component {
     this._callbacksMap = {};
   }
 
-  sortNames(a, b) {
-    return (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0;
-  }
-
-  sortAges(a, b) {
-    return a.age - b.age;
-  }
-
   hide() {
     this._element.hidden = true;
   }

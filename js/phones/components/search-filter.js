@@ -3,9 +3,7 @@ import Component from '../../component.js';
 export default class Filter extends Component {
   constructor({ element }) {
     super({ element });
-
     this._element = element;
-
     this._inputStatus = true;
 
     this._render();

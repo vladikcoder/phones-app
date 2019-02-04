@@ -3,9 +3,7 @@ import Component from '../../component.js';
 export default class ShoppingCart extends Component {
   constructor({ element }) {
     super({ element });
-
     this._element = element;
-
     this._itemsCount = {};
 
     this._render(this._itemsCount);
@@ -16,7 +14,6 @@ export default class ShoppingCart extends Component {
   }
 
   _render(cartItemsList) {
-
     this._element.innerHTML = `
       <p>Shopping Cart</p>
       <ul data-element="shop-items-container">

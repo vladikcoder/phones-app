@@ -9,26 +9,20 @@ import Component from '../component.js';
 export default class PhonesPage extends Component{
   constructor({ element }) {
     super({ element });
-
     this._element = element;
 
     this._render();
 
     this._initCatalogue();
-
     this._initViewer();
-
     this._initFilter();
-
     this._initSort();
-
     this._initCart();
   }
 
   _initCatalogue() {
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
-      phones: PhoneService.getPhones(),
     });
 
     this._catalogue.subscribe('select-phone', (phoneId) => {
@@ -38,29 +32,27 @@ export default class PhonesPage extends Component{
     });
 
     this._catalogue.subscribe('add-from-catalogue', (event) => {
-      let currentPhone = event.target.closest('[data-element="phone-in-list"]');
-      let phoneId = currentPhone.dataset.phoneId;
+      PhoneService.getPhones((parsedPhones) => {
+        let currentPhone = event.target.closest('[data-element="phone-in-list"]');
+        let phoneId = currentPhone.dataset.phoneId;
+        let phoneInfo = parsedPhones.find(phone => phone.id === phoneId);
+        let phoneName = phoneInfo.name;
+        let cartItemsList = this._cart._itemsCount;
 
-      let phoneInfo = PhoneService.getPhones().filter(phone => phone.id === phoneId)[0];
+        if (!cartItemsList.hasOwnProperty(phoneName)) {
+          cartItemsList[phoneName] = 1;
+        } else {
+          cartItemsList[phoneName] += 1;
+        }
 
-      let phoneName = phoneInfo.name;
-
-      let cartItemsList = this._cart._itemsCount;
-
-      if (!cartItemsList.hasOwnProperty(phoneName)) {
-        cartItemsList[phoneName] = 1;
-      } else {
-        cartItemsList[phoneName] += 1;
-      }
-
-      this._cart._render(cartItemsList);
+        this._cart._render(cartItemsList);
+      });
     });
   }
 
   _initViewer() {
     this._viewer = new PhoneViewer({
       element: document.querySelector('[data-component="phone-viewer"]'),
-      phonesDetails: PhoneService.getById,
     });
 
     this._viewer.subscribe('back-button', () => {
@@ -70,7 +62,6 @@ export default class PhonesPage extends Component{
 
     this._viewer.subscribe('add-from-viewer', (addToCartBtn) => {
       let cartItemsList = this._cart._itemsCount;
-
       let nameToAdd = addToCartBtn.dataset.addName;
 
       if (!cartItemsList.hasOwnProperty(nameToAdd)) {
@@ -84,7 +75,6 @@ export default class PhonesPage extends Component{
 
     this._viewer.subscribe('set-gallery-preview', (imageSelected) => {
       let imgPreviewElement = this._element.querySelector('[data-element="image-preview"]');
-
       imgPreviewElement.src = imageSelected.src;
     });
   }
@@ -101,10 +91,8 @@ export default class PhonesPage extends Component{
       }
 
       this._catalogue._phones = [...this._filter._cachedPhones];
-
       let reg = new RegExp(inputItem.value, 'i');
-      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => phonesObj.name.match(reg));
-
+      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => reg.test(phonesObj.name));
       this._catalogue._render();
 
       if (inputItem.value === '') {
@@ -117,6 +105,13 @@ export default class PhonesPage extends Component{
     this._sort = new Sort({
       element: document.querySelector('[data-component="sort-select"]'),
     });
+
+    this.sortNames = (a, b) => {
+      return (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0;
+    };
+    this.sortAges = (a, b) => {
+      return a.age - b.age;
+    };
 
     this._sort.subscribe('sort-type-changed', (dropDown) => {
       if (dropDown.value === 'name') {
@@ -147,9 +142,7 @@ export default class PhonesPage extends Component{
     });
 
     this._cart.subscribe('decrease-item', (itemToDecrease) => {
-
       let cartItemsList = this._cart._itemsCount;
-
       let nameToDecrease = itemToDecrease.dataset.decreaseName;
 
       if (cartItemsList[nameToDecrease] > 1) {
