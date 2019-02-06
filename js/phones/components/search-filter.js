@@ -4,7 +4,7 @@ export default class Filter extends Component {
   constructor({ element }) {
     super({ element });
     this._element = element;
-    this._inputStatus = true;
+    this._isInputClearBeforeFiltering = true;
 
     this._render();
 
@@ -15,9 +15,17 @@ export default class Filter extends Component {
 
   subscribe(eventName, callback) {
     const DEBOUNCE_DELAY = 300;
-    let debouncedCallback = this.debounce(callback, DEBOUNCE_DELAY);
+    let debouncedCallback = this._helper.debounce(callback, DEBOUNCE_DELAY);
 
     super.subscribe(eventName, debouncedCallback);
+  }
+
+  getCachedPhones() {
+    return this._cachedPhones;
+  }
+
+  setCachedPhones(phonesArr) {
+    this._cachedPhones = [...phonesArr];
   }
 
   _render() {

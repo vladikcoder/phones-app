@@ -27,15 +27,14 @@ export default class PhonesPage extends Component{
 
     this._catalogue.subscribe('select-phone', (phoneId) => {
       this._catalogue.hide();
-      this._viewer.show();
-      this._viewer._render(phoneId);
+      this._viewer.show(phoneId);
     });
 
     this._catalogue.subscribe('add-from-catalogue', (event) => {
-      PhoneService.getPhones((parsedPhones) => {
-        let currentPhone = event.target.closest('[data-element="phone-in-list"]');
-        let phoneId = currentPhone.dataset.phoneId;
-        let phoneInfo = parsedPhones.find(phone => phone.id === phoneId);
+      let currentPhone = event.target.closest('[data-element="phone-in-list"]');
+      let phoneId = currentPhone.dataset.phoneId;
+
+      PhoneService.getById(phoneId, (phoneInfo) => {
         let phoneName = phoneInfo.name;
         let cartItemsList = this._cart._itemsCount;
 
@@ -84,20 +83,25 @@ export default class PhonesPage extends Component{
       element: document.querySelector('[data-component="search-filter"]'),
     });
 
-    this._filter.subscribe('on-input-change', (inputItem) => {
-      if (this._filter._inputStatus) {
-        this._filter._cachedPhones = [...this._catalogue._phones];
-        this._filter._inputStatus = false;
+    this.inputAnalyser = (inputItem) => {
+      if (this._filter._isInputClearBeforeFiltering) {
+        this._filter._cachedPhones = this._catalogue.getCataloguePhones();
+        this._filter._isInputClearBeforeFiltering = false;
       }
 
-      this._catalogue._phones = [...this._filter._cachedPhones];
+      this._catalogue.setCataloguePhones([...this._filter._cachedPhones]);
       let reg = new RegExp(inputItem.value, 'i');
-      this._catalogue._phones = this._catalogue._phones.filter(phonesObj => reg.test(phonesObj.name));
-      this._catalogue._render();
+      let filteredPhonesList = this._catalogue.getCataloguePhones().filter(phonesObj => reg.test(phonesObj.name));
+      this._catalogue.setCataloguePhones(filteredPhonesList);
+      this._catalogue.refresh();
 
       if (inputItem.value === '') {
-        this._filter._inputStatus = true;
+        this._filter._isInputClearBeforeFiltering = true;
       }
+    };
+
+    this._filter.subscribe('on-input-change', (inputItem) => {
+      this.inputAnalyser(inputItem);
     });
   }
 
@@ -106,31 +110,34 @@ export default class PhonesPage extends Component{
       element: document.querySelector('[data-component="sort-select"]'),
     });
 
-    this.sortNames = (a, b) => {
-      return (a.name < b.name) ?  -1 : (a.name > b.name) ? 1 : 0;
-    };
-    this.sortAges = (a, b) => {
-      return a.age - b.age;
+    this.sortFunc = (sortBy) => {
+      return (a, b) => {
+        return (a[sortBy] < b[sortBy]) ? -1 : 1;
+      }
     };
 
     this._sort.subscribe('sort-type-changed', (dropDown) => {
       if (dropDown.value === 'name') {
-        this._catalogue._phones.sort(this.sortNames);
+        let sortedByName = this._catalogue.getCataloguePhones().sort(this.sortFunc('name'));
+        this._catalogue.setCataloguePhones(sortedByName);
 
-        if (this._filter._cachedPhones) {
-          this._filter._cachedPhones.sort(this.sortNames);
+        if (this._filter.getCachedPhones()) {
+          let syncedSortWithFiltering = this._filter.getCachedPhones().sort(this.sortFunc('name'));
+          this._filter.setCachedPhones(syncedSortWithFiltering);
         }
 
-        this._catalogue._render();
+        this._catalogue.refresh();
 
       } else if (dropDown.value === 'age') {
-        this._catalogue._phones.sort(this.sortAges);
+        let sortedByAge = this._catalogue.getCataloguePhones().sort(this.sortFunc('age'));
+        this._catalogue.setCataloguePhones(sortedByAge);
 
-        if (this._filter._cachedPhones) {
-          this._filter._cachedPhones.sort(this.sortAges);
+        if (this._filter.getCachedPhones()) {
+          let syncedSortWithFiltering = this._filter.getCachedPhones().sort(this.sortFunc('age'));
+          this._filter.setCachedPhones(syncedSortWithFiltering);
         }
 
-        this._catalogue._render();
+        this._catalogue.refresh();
       }
 
     })

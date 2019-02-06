@@ -21,6 +21,18 @@ export default class PhonesCatalogue extends Component {
     })
   }
 
+  getCataloguePhones() {
+    return [...this._phones];
+  }
+
+  setCataloguePhones(phonesArr) {
+    this._phones = [...phonesArr];
+  }
+
+  refresh() {
+    this._render();
+  }
+
   _render() {
     this._element.innerHTML = `
       <ul class="phones">

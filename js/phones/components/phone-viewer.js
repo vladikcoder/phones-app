@@ -19,9 +19,16 @@ export default class PhoneViewer extends Component {
     });
   }
 
-  _render(phoneId) {
+  show(phoneId) {
     PhoneService.getById(phoneId, (phone) => {
-      this._element.innerHTML = `
+      this._render(phone);
+    });
+
+    super.show();
+  }
+
+  _render(phone) {
+    this._element.innerHTML = `
         <img 
           data-element="image-preview" 
           class="phone" 
@@ -50,9 +57,6 @@ export default class PhoneViewer extends Component {
           `).join('')}
         </ul>
     `;
-    });
-
-
 
   }
 };

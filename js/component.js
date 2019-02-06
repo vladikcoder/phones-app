@@ -2,6 +2,25 @@ export default class Component {
   constructor({ element }) {
     this._element = element;
     this._callbacksMap = {};
+    this._helper = {
+      debounce(func, ms) {
+        let isBusy = false;
+        let timerId;
+        function wrapper(arg) {
+          if (isBusy) {
+            clearTimeout(timerId);
+          }
+
+          isBusy = true;
+          timerId = setTimeout(() => {
+            func.call(this, arg);
+            isBusy = false;
+          }, ms);
+        }
+
+        return wrapper;
+      },
+    };
   }
 
   hide() {
@@ -37,21 +56,4 @@ export default class Component {
     this._callbacksMap[eventName](...data);
   }
 
-  debounce(func, ms) {
-    let isBusy = false;
-    let timerId;
-    function wrapper(arg) {
-      if (isBusy) {
-        clearTimeout(timerId);
-      }
-
-      isBusy = true;
-      timerId = setTimeout(() => {
-        func.call(this, arg);
-        isBusy = false;
-      }, ms);
-    }
-
-    return wrapper;
-  }
 };
