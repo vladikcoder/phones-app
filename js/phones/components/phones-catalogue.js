@@ -6,17 +6,12 @@ export default class PhonesCatalogue extends Component {
     super({ element });
     this._element = element;
 
-    PhoneService.getPhones((phones) => {
-      this._phones = phones;
-      this._render();
-    });
-
     this.on('click', 'add-button', (event) => {
       this.emit('add-from-catalogue', event);
     });
+
     this.on('click', 'phone-selected',  (event, phoneSelectedElement) => {
       let phoneId = phoneSelectedElement.closest('[data-element="phone-in-list"]').dataset.phoneId;
-
       this.emit('select-phone', phoneId);
     })
   }
@@ -29,16 +24,17 @@ export default class PhonesCatalogue extends Component {
     this._phones = [...phonesArr];
   }
 
-  refresh() {
-    this._render();
+  refresh(from, to) {
+    this._render(from, to);
   }
 
-  _render() {
+  _render(from, to) {
     this._element.innerHTML = `
+      
       <ul class="phones">
       
         ${
-          this._phones.map(phone => `
+          this._phones.slice(from, to).map(phone => `
             <li 
               data-element="phone-in-list"
               data-phone-id="${phone.id}"
