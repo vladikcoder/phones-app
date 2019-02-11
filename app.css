@@ -105,3 +105,32 @@ ul.specs dt {
 h1 {
   border-bottom: 1px solid gray;
 }
+
+[data-element="cart-item-qty"] {
+  color: #0200ff;
+}
+
+[data-element="empty-cart-label"] {
+  color: #f00;
+}
+
+[data-element="decrease-item-qty-btn"] {
+  color: #f00;
+  cursor: pointer;
+}
+
+[data-element="page-number"] {
+  background: #fff;
+  border: 1px solid lightgrey;
+  cursor: pointer;
+  margin: 3px;
+  padding: 5px 9px 5px 9px;
+}
+
+[data-element*="container"] {
+  display: inline-block;
+}
+
+.current-page {
+    background: darksalmon;
+}
