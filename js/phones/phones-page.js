@@ -4,6 +4,7 @@ import PhoneService from './services/phone-service.js';
 import ShoppingCart from './components/shopping-cart.js';
 import Sort from './components/sort-select.js';
 import Filter from './components/search-filter.js';
+import PaginationFilter from './components/pagination-filter.js';
 import Component from '../component.js';
 
 export default class PhonesPage extends Component{
@@ -13,16 +14,25 @@ export default class PhonesPage extends Component{
 
     this._render();
 
-    this._initCatalogue();
-    this._initViewer();
-    this._initFilter();
-    this._initSort();
+    this._initPagination();
     this._initCart();
+    this._initSort();
+    this._initFilter();
+    this._initViewer();
+    this._initCatalogue();
   }
 
   _initCatalogue() {
     this._catalogue = new PhonesCatalogue({
       element: document.querySelector('[data-component="phones-catalogue"]'),
+    });
+
+    PhoneService.getPhones((phones) => {
+      this._catalogue._phones = phones;
+      this._catalogue.refresh();
+
+      let pagesDropdown = document.querySelector('[data-element="page-items-qty-dropdown"]');
+      this._pagination.renderPages(+pagesDropdown.value);
     });
 
     this._catalogue.subscribe('select-phone', (phoneId) => {
@@ -36,7 +46,7 @@ export default class PhonesPage extends Component{
 
       PhoneService.getById(phoneId, (phoneInfo) => {
         let phoneName = phoneInfo.name;
-        let cartItemsList = this._cart._itemsCount;
+        let cartItemsList = this._cart.getItemsCount();
 
         if (!cartItemsList.hasOwnProperty(phoneName)) {
           cartItemsList[phoneName] = 1;
@@ -44,7 +54,7 @@ export default class PhonesPage extends Component{
           cartItemsList[phoneName] += 1;
         }
 
-        this._cart._render(cartItemsList);
+        this._cart.refresh(cartItemsList);
       });
     });
   }
@@ -69,7 +79,7 @@ export default class PhonesPage extends Component{
         cartItemsList[nameToAdd] += 1;
       }
 
-      this._cart._render(cartItemsList);
+      this._cart.refresh(cartItemsList);
     });
 
     this._viewer.subscribe('set-gallery-preview', (imageSelected) => {
@@ -95,6 +105,9 @@ export default class PhonesPage extends Component{
       this._catalogue.setCataloguePhones(filteredPhonesList);
       this._catalogue.refresh();
 
+      let pagesDropdown = document.querySelector('[data-element="page-items-qty-dropdown"]');
+      this._pagination.renderPages(+pagesDropdown.value);
+
       if (inputItem.value === '') {
         this._filter._isInputClearBeforeFiltering = true;
       }
@@ -117,29 +130,17 @@ export default class PhonesPage extends Component{
     };
 
     this._sort.subscribe('sort-type-changed', (dropDown) => {
-      if (dropDown.value === 'name') {
-        let sortedByName = this._catalogue.getCataloguePhones().sort(this.sortFunc('name'));
-        this._catalogue.setCataloguePhones(sortedByName);
+        let sortedBy = this._catalogue.getCataloguePhones().sort(this.sortFunc(dropDown.value));
+        this._catalogue.setCataloguePhones(sortedBy);
 
         if (this._filter.getCachedPhones()) {
-          let syncedSortWithFiltering = this._filter.getCachedPhones().sort(this.sortFunc('name'));
+          let syncedSortWithFiltering = this._filter.getCachedPhones().sort(this.sortFunc(dropDown.value));
           this._filter.setCachedPhones(syncedSortWithFiltering);
         }
 
+        let pagesDropdown = document.querySelector('[data-element="page-items-qty-dropdown"]');
         this._catalogue.refresh();
-
-      } else if (dropDown.value === 'age') {
-        let sortedByAge = this._catalogue.getCataloguePhones().sort(this.sortFunc('age'));
-        this._catalogue.setCataloguePhones(sortedByAge);
-
-        if (this._filter.getCachedPhones()) {
-          let syncedSortWithFiltering = this._filter.getCachedPhones().sort(this.sortFunc('age'));
-          this._filter.setCachedPhones(syncedSortWithFiltering);
-        }
-
-        this._catalogue.refresh();
-      }
-
+        this._pagination.renderPages(+pagesDropdown.value);
     })
   }
 
@@ -162,6 +163,52 @@ export default class PhonesPage extends Component{
     })
   }
 
+  _initPagination() {
+    this._pagination = new PaginationFilter({
+      element: document.querySelector('[data-component="pagination-filter"]'),
+    });
+
+    this._pagination.renderPages = (elemsOnPage) => {
+      this._catalogue.refresh(0, elemsOnPage);
+      let pagesContainer = this._pagination._element.querySelector('[data-element="pages-container"]');
+      let pagesQty = Math.ceil(this._catalogue.getCataloguePhones().length/elemsOnPage);
+      let pagesArr = [];
+      for (let i=1; i<=pagesQty; i++) {
+        pagesArr.push(i);
+      }
+      pagesContainer.innerHTML = `
+            ${pagesArr.map(pageNumber => `
+              <span 
+                ${(pageNumber === 1) ? 'class="current-page"' : ''}
+                data-items-from="${pageNumber * elemsOnPage - elemsOnPage}"
+                data-items-to="${pageNumber * elemsOnPage}" 
+                data-element="page-number"
+              >
+                ${pageNumber}
+              </span>`).join('')}
+          `;
+    };
+
+    this._pagination.subscribe('page-items-qty-changed', (dropDown) => {
+      this._pagination.renderPages(+dropDown.value);
+    });
+
+    this._pagination.subscribe('page-selected', (pageNumber) => {
+      let pagesContainer = pageNumber.parentElement;
+      for (let pageEl of pagesContainer.children) {
+        if (pageEl.classList.contains('current-page')) {
+          pageEl.classList.remove('current-page');
+        }
+      }
+      pageNumber.classList.add('current-page');
+
+      let from = pageNumber.dataset.itemsFrom;
+      let to = pageNumber.dataset.itemsTo;
+      this._catalogue.refresh(from, to);
+    });
+
+  }
+
   _render() {
     this._element.innerHTML = `
       <div class="row">
@@ -182,7 +229,7 @@ export default class PhonesPage extends Component{
     
         <!--Main content-->
         <div class="col-md-10">
-          
+          <div data-component="pagination-filter"></div>
           <div data-component="phones-catalogue"></div>
           <div data-component="phone-viewer"></div>
               

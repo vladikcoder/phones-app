@@ -118,3 +118,19 @@ h1 {
   color: #f00;
   cursor: pointer;
 }
+
+[data-element="page-number"] {
+  background: #fff;
+  border: 1px solid lightgrey;
+  cursor: pointer;
+  margin: 3px;
+  padding: 5px 9px 5px 9px;
+}
+
+[data-element*="container"] {
+  display: inline-block;
+}
+
+.current-page {
+    background: darksalmon;
+}

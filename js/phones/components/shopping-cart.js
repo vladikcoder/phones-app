@@ -13,6 +13,14 @@ export default class ShoppingCart extends Component {
     })
   }
 
+  getItemsCount() {
+    return this._itemsCount;
+  }
+
+  refresh(cartItemsList) {
+    this._render(cartItemsList);
+  }
+
   _render(cartItemsList) {
     this._element.innerHTML = `
       <p>Shopping Cart</p>
